@@ -1,5 +1,6 @@
 import cvxpy as cp
 import numpy as np
+import matplotlib.pyplot as plt
 
 def main():
     x = cp.Variable(nonneg=True)
@@ -8,6 +9,7 @@ def main():
 
     cost = x + y
     prob = cp.Problem(cp.Minimize(cost), constraints)
+    print(f"The problem is dcp_compliant? {prob.is_dcp()}")
     prob.solve()
 
     print(f"The problem status is {prob.status}")
