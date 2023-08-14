@@ -15,7 +15,7 @@ def main():
 
     constraints = [
         y_tilde[0] == y_hat[0] - l[0],
-        y_tilde[N-1] == y_hat[N-1] - l[N-2], 
+        y_tilde[N-1] == y_hat[N-1] + l[N-2], 
         cp.sum(l) <= 0.1 * cp.sum(y_hat)
     ]
 
