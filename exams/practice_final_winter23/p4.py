@@ -2,15 +2,15 @@ import cvxpy as cp
 import numpy as np
 import matplotlib.pyplot as plt
 
-import data.consistent_decile_data as data
+import data.max_util_wireless_data as data
 
 def main():
     x = cp.Variable(nonneg=True)
     y = cp.Variable(nonneg=True)
     constraints = [x >= y, y >= 1]
 
-    cost = x + y
-    prob = cp.Problem(cp.Minimize(cost), constraints)
+    utility = x + y
+    prob = cp.Problem(cp.Maximize(utility), constraints)
     print(f"The problem is dcp_compliant? {prob.is_dcp()}")
     prob.solve()
 
