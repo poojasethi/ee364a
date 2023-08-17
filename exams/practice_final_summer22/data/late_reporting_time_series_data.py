@@ -57,4 +57,4 @@ def plot_helper(y_rec):
     plt.xlabel("$t$")
     plt.legend()
     plt.ylim((2,6))
-    plt.savefig("files/figures/rec_series_late_reporting.pdf")
+    # plt.savefig("files/figures/rec_series_late_reporting.pdf")
