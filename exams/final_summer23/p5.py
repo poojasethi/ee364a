@@ -12,7 +12,6 @@ def main():
     alpha = cp.Variable(K, pos=True)
     P = cp.Variable(K, pos=True)
 
-    
     constraints = [
         W_eng_min <= W_eng,
         W_eng <= W_eng_max,
@@ -52,7 +51,7 @@ def main():
         W_wing = CW * (S ** 1.2)
         W = W_bat + W_eng + W_wing + W_pay[i] + W_base
 
-        F_drag = 0.5 * rho * (V[i] ** 2) * drag_coeff(alpha) * S
+        F_drag = 0.5 * rho * (V[i] ** 2) * drag_coeff(alpha[i]) * S
         T = P[i] * (V[i] ** -1)
 
         additional_constraints = [W <= F_lift, F_drag <= T]
@@ -66,7 +65,7 @@ def main():
 
     W_wing = CW * (S ** 1.2) 
     design_cost = 100 * W_eng + 45 * W_bat + 2 * W_wing
-    mission_cost = cp.sum(T + 10 * alpha) 
+    mission_cost = cp.sum(cp.multiply(P, (V ** -1)) + 10 * alpha) 
     cost = design_cost + mission_cost
 
     prob = cp.Problem(cp.Minimize(cost), constraints)
@@ -74,8 +73,40 @@ def main():
     prob.solve(gp=True)
 
     print(f"The problem status is {prob.status}")
-    print(f"The optimal cost is {round(prob.value, 6)}")
-    print("*" * 100)
+    print(f"The total optimal cost is {round(prob.value, 6)}")
+    print()
+
+    print("Optimal costs:")
+    print(f"C_des={(100 * W_eng + 45 * W_bat + 2 * CW * (S ** 1.2)).value}")
+    print(f"C_mis={cp.sum(cp.multiply(P, (V ** -1)) + 10 * alpha).value}")
+    print()
+
+    print("Design variables:")
+    print(f"The optimal W_eng is {round(W_eng.value, 6)}")
+    print(f"The optimal W_bat is {round(W_bat.value, 6)}")
+    print(f"The optimal S is {round(S.value, 6)}")
+    print()
+
+    print("Mission variables:")
+    print(f"The optimal alpha is {alpha.value}")
+    print(f"The optimal power is {P.value}")
+    print(f"")
+
+    print("Are the relaxed constraints tight?")
+    for i in range(0, K):
+        print(f"Mission {i}")
+        F_lift = 0.5 * rho * (V[i] ** 2) * lift_coeff(alpha[i]) * S
+        W_wing = CW * (S ** 1.2)
+        W = W_bat + W_eng + W_wing + W_pay[i] + W_base
+
+        F_drag = 0.5 * rho * (V[i] ** 2) * drag_coeff(alpha[i]) * S
+        T = P[i] * (V[i] ** -1) 
+
+        print(f"\tW: {W.value}")
+        print(f"\tF_lift: {F_lift.value}")
+
+        print(f"\tF_drag: {F_drag.value}")
+        print(f"\tT: {T.value}")
 
 if __name__ == "__main__":
     main()
